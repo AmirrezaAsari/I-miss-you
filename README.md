@@ -70,6 +70,7 @@ Some chat messages (like from screenshots) may lack timestamps.
 These can still be used for personality/style learning, but are less useful for time-based context.
 Data will grow as more exports are added. Just rerun data.py to regenerate.
 
+---
 
 ##Agent
 
