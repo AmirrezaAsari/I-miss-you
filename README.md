@@ -65,25 +65,25 @@ Media messages include metadata:
   "timestamp": "2023-05-12 14:37:00"
 }
 ```
-####Notes
+#### Notes
 Some chat messages (like from screenshots) may lack timestamps.
 These can still be used for personality/style learning, but are less useful for time-based context.
 Data will grow as more exports are added. Just rerun data.py to regenerate.
 
 ---
 
-##Agent
+## Agent
 
 (Future: Describe how the chat agent will work — retrieval, style mimic, response generation.)
 
-##APP
+## APP
 
 (Future: details about the app that will get messages from user to llm.)
 
-##UI
+## UI
 
 (Future: Add details about the planned Telegram-style interface.)
 
-#License
+# License
 
 Personal/research project – not intended for production use.
