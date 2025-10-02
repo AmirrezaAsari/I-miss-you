@@ -86,4 +86,4 @@ Data will grow as more exports are added. Just rerun data.py to regenerate.
 
 # License
 
-Personal/research project – not intended for production use.
+Personal/research/fun project.
