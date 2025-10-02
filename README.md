@@ -1,4 +1,4 @@
-# I Miss You – Chat Agent Project
+# Miss You – Chat Agent Project
 
 ## Overview
 This project is an experimental AI agent that can chat in the style of a person using historical conversation data.  
