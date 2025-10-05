@@ -1,18 +1,21 @@
 import json
+import random
 
 # === config ===
-INPUT_FILE = "./data/sara_chat.json"   # your current message dataset
-OUTPUT_FILE = "./data/train.jsonl"    # output for fine-tuning
-TARGET_SENDER = "Sara"         # the person whose style you want to model
+INPUT_FILE = "./data/sara_chat.json"    # your raw message dataset
+OUTPUT_TRAIN = "./train.jsonl"    # output for training
+OUTPUT_VALID = "./valid.jsonl"    # output for validation
+TARGET_SENDER = "Sara"          # person whose style you want to model
+VALID_RATIO = 0.2               # 20% for validation
 
 # === load data ===
 with open(INPUT_FILE, "r", encoding="utf-8") as f:
     messages = json.load(f)
 
-# === sort by timestamp just in case ===
+# === sort by time (important if unsorted) ===
 messages.sort(key=lambda x: x["timestamp"])
 
-# === merge consecutive messages from the same sender ===
+# === merge consecutive messages from same sender ===
 merged = []
 for msg in messages:
     if merged and merged[-1]["sender"] == msg["sender"]:
@@ -24,13 +27,12 @@ for msg in messages:
             "timestamp": msg["timestamp"]
         })
 
-# === create training samples ===
+# === create samples ===
 samples = []
 for i in range(len(merged) - 1):
     curr = merged[i]
     nxt = merged[i + 1]
 
-    # only use turns where the next message is from the target sender (Sara)
     if nxt["sender"] == TARGET_SENDER and curr["sender"] != TARGET_SENDER:
         samples.append({
             "instruction": f"Continue the chat as {TARGET_SENDER} in her usual style.",
@@ -38,9 +40,19 @@ for i in range(len(merged) - 1):
             "output": nxt["message"]
         })
 
-# === save to jsonl ===
-with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    for sample in samples:
-        f.write(json.dumps(sample, ensure_ascii=False) + "\n")
+# === shuffle and split ===
+random.shuffle(samples)
+split_idx = int(len(samples) * (1 - VALID_RATIO))
+train_samples = samples[:split_idx]
+valid_samples = samples[split_idx:]
 
-print(f"✅ Done! Generated {len(samples)} training samples in {OUTPUT_FILE}")
+# === save ===
+def save_jsonl(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        for s in data:
+            f.write(json.dumps(s, ensure_ascii=False) + "\n")
+
+save_jsonl(OUTPUT_TRAIN, train_samples)
+save_jsonl(OUTPUT_VALID, valid_samples)
+
+print(f"✅ Done! {len(train_samples)} train + {len(valid_samples)} valid samples created.")
