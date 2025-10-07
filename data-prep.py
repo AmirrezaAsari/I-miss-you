@@ -2,10 +2,10 @@ import json
 import random
 
 # === config ===
-INPUT_FILE = "./data/sara_chat.json"    # your raw message dataset
+INPUT_FILE = "data.json"    # your raw message dataset
 OUTPUT_TRAIN = "./train.jsonl"    # output for training
 OUTPUT_VALID = "./valid.jsonl"    # output for validation
-TARGET_SENDER = "Sara"          # person whose style you want to model
+TARGET_SENDER = "Their Name"          # person whose style you want to model
 VALID_RATIO = 0.2               # 20% for validation
 
 # === load data ===
