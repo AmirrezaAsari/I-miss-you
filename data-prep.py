@@ -1,6 +1,6 @@
 import json
 
-input_path = "raw_data_path"      
+input_path = "input file"      
 output_path = "tinyllama_chat.jsonl"     
 
 system_prompt = "Continue the chat as Sara in her usual style."
@@ -17,8 +17,9 @@ with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", e
 
         role = "assistant" if item.get("sender") == "Sara" else "user"
         messages.append({"role": role, "content": text})
+        json.dump({"messages": messages}, outfile, ensure_ascii=False)
+        outfile.write("\n")
 
-    json.dump({"messages": messages}, outfile, ensure_ascii=False)
-    outfile.write("\n")
+
 
 print(f"✅ Conversion done! Output saved to {output_path}")
