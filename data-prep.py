@@ -3,7 +3,7 @@ import json
 input_path = "input file"      
 output_path = "tinyllama_chat.jsonl"     
 
-system_prompt = "Continue the chat as Sara in her usual style."
+system_prompt = "Continue the chat as Person_Name in her usual style."
 
 with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", encoding="utf-8") as outfile:
     data = json.load(infile)
