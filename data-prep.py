@@ -1,58 +1,27 @@
+## convert the chat data to a lm tuning friendly
 import json
 import random
+import json
 
-# === config ===
-INPUT_FILE = "data.json"    # your raw message dataset
-OUTPUT_TRAIN = "./train.jsonl"    # output for training
-OUTPUT_VALID = "./valid.jsonl"    # output for validation
-TARGET_SENDER = "Their Name"          # person whose style you want to model
-VALID_RATIO = 0.2               # 20% for validation
+input_path = "./data/sara_chat.json"     # main chat file
+output_path = "tinyllama_chat.jsonl" # final result
 
-# === load data ===
-with open(INPUT_FILE, "r", encoding="utf-8") as f:
-    messages = json.load(f)
+system_prompt = "Continue the chat as Sara in her usual style."
 
-# === sort by time (important if unsorted) ===
-messages.sort(key=lambda x: x["timestamp"])
+with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", encoding="utf-8") as outfile:
+    data = json.load(infile)
 
-# === merge consecutive messages from same sender ===
-merged = []
-for msg in messages:
-    if merged and merged[-1]["sender"] == msg["sender"]:
-        merged[-1]["message"] += "\n" + msg["message"]
-    else:
-        merged.append({
-            "sender": msg["sender"],
-            "message": msg["message"],
-            "timestamp": msg["timestamp"]
-        })
+    messages = [{"role": "system", "content": system_prompt}]
 
-# === create samples ===
-samples = []
-for i in range(len(merged) - 1):
-    curr = merged[i]
-    nxt = merged[i + 1]
+    for item in data:
+        text = item.get("message", "").strip()
+        if not text:
+            continue  
+        role = "assistant" if item.get("sender") == "Sara" else "user"
+        messages.append({"role": role, "content": text})
 
-    if nxt["sender"] == TARGET_SENDER and curr["sender"] != TARGET_SENDER:
-        samples.append({
-            "instruction": f"Continue the chat as {TARGET_SENDER} in her usual style.",
-            "input": f"{curr['sender']}: {curr['message']}",
-            "output": nxt["message"]
-        })
+    
+    json.dump({"messages": messages}, outfile, ensure_ascii=False)
+    outfile.write("\n")
 
-# === shuffle and split ===
-random.shuffle(samples)
-split_idx = int(len(samples) * (1 - VALID_RATIO))
-train_samples = samples[:split_idx]
-valid_samples = samples[split_idx:]
-
-# === save ===
-def save_jsonl(path, data):
-    with open(path, "w", encoding="utf-8") as f:
-        for s in data:
-            f.write(json.dumps(s, ensure_ascii=False) + "\n")
-
-save_jsonl(OUTPUT_TRAIN, train_samples)
-save_jsonl(OUTPUT_VALID, valid_samples)
-
-print(f"✅ Done! {len(train_samples)} train + {len(valid_samples)} valid samples created.")
+print(f"Conversion done! Output saved to {output_path}")
